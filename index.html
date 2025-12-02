@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,33 +7,76 @@
 
 <style>
     body {
-        font-family: 'Poppins', sans-serif;
-        background: #ffffff;
-        margin: 0;
-        padding: 0;
+        font-family: Arial, sans-serif;
         text-align: center;
-        color: #333;
+        padding: 40px 10px;
     }
-    .box {
-        max-width: 500px;
-        margin: 60px auto;
-        padding: 25px;
-        border-radius: 16px;
-        background: #fafafa;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+
+    #btnIr {
+        background: #4CAF50;
+        color: #fff;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        cursor: not-allowed;
+        opacity: 0.6;
     }
-    h1 {
-        font-size: 26px;
-        color: #007bff;
+
+    #btnIr.ativo {
+        cursor: pointer;
+        opacity: 1;
     }
-    #timer {
-        font-size: 50px;
-        margin: 20px 0;
-        font-weight: bold;
-        color: #007bff;
+
+    #pub {
+        margin-top: 40px;
+        display: block;
     }
-    .btn {
-        display: inline-block;
+</style>
+</head>
+<body>
+
+<h2>Você será redirecionado em <span id="contador">10</span> segundos...</h2>
+
+<!-- BOTÃO -->
+<button id="btnIr" disabled>Ir agora</button>
+
+<!-- PUBLICIDADE -->
+<div id="pub">
+    <iframe src="https://zerads.com/ad/ad.php?width=468&ref=9545"
+        width="468" height="60" style="border:0;" scrolling="no"></iframe>
+</div>
+
+<script>
+// PEGAR LINK DO ?url=
+const params = new URLSearchParams(window.location.search);
+const destino = params.get("url") || "https://google.com"; // fallback
+
+// CONTADOR
+let tempo = 10;
+const contador = document.getElementById("contador");
+const btn = document.getElementById("btnIr");
+
+const intervalo = setInterval(() => {
+    tempo--;
+    contador.textContent = tempo;
+
+    if (tempo <= 0) {
+        clearInterval(intervalo);
+        btn.disabled = false;
+        btn.classList.add("ativo");
+        btn.textContent = "Ir agora";
+    }
+}, 1000);
+
+// CLIQUE DO BOTÃO
+btn.addEventListener("click", () => {
+    window.location.href = destino;
+});
+</script>
+
+</body>
+</html>
         padding: 12px 22px;
         margin-top: 20px;
         background: #007bff;
