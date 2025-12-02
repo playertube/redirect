@@ -1,39 +1,249 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Redirecionando...</title>
-
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        padding: 40px 10px;
-        background: #f5f5f5;
-    }
+  :root{
+    --bg:#ffffff;
+    --card:#fafafa;
+    --accent:#007bff;
+    --muted:#666;
+  }
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:var(--bg);
+    color:#111;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding:20px;
+  }
+  .wrap{
+    width:100%;
+    max-width:680px;
+    background:var(--card);
+    border-radius:12px;
+    box-shadow:0 8px 30px rgba(16,24,40,0.06);
+    padding:28px;
+    text-align:center;
+  }
+  h1{ margin:0 0 6px; color:var(--accent); }
+  p.sub{ margin:0 0 18px; color:var(--muted); }
+  #timer{ font-size:48px; font-weight:700; color:var(--accent); margin-bottom:14px; }
+  #btnIr{
+    display:inline-block;
+    padding:12px 22px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    background:#ddd;
+    color:#333;
+    cursor:not-allowed;
+    border:0;
+    transition:all .18s;
+  }
+  #btnIr.ativo{
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+  }
 
-    h2 {
-        color: #333;
-    }
+  .adbox{
+    margin-top:22px;
+    background:#fff;
+    border-radius:10px;
+    padding:12px;
+    border:1px solid #eee;
+  }
+  .ad-title{ font-size:13px; color:var(--muted); margin-bottom:8px; text-align:left;}
+  .ad-placeholder{
+    width:100%;
+    height:60px;
+    background:linear-gradient(90deg,#f0f2f5,#eef3fb);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#999;
+    border-radius:6px;
+    overflow:hidden;
+  }
 
-    #contador {
-        font-size: 22px;
-        margin: 15px 0;
-        color: #444;
-    }
+  .notice{
+    margin-top:14px;
+    font-size:13px;
+    color:#444;
+  }
 
-    #btnIr {
-        background: #008CFF;
-        color: #fff;
-        padding: 14px 30px;
-        font-size: 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: not-allowed;
-        opacity: 0.5;
-        transition: .3s;
+  @media (max-width:420px){
+    #timer{ font-size:40px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap" role="main">
+  <h1>Redirecionando...</h1>
+  <p class="sub">Você será enviado ao site em</p>
+
+  <div id="timer">15</div>
+
+  <button id="btnIr" aria-live="polite">Ir agora</button>
+
+  <div class="adbox" aria-hidden="false">
+    <div class="ad-title">Publicidade</div>
+
+    <!--
+      1) Substitua o iframe abaixo pelo seu código de anúncio HTTPS.
+      2) Se o provedor não oferecer HTTPS, mantenha o placeholder (linha abaixo) para evitar bloqueio.
+    -->
+    <!-- Exemplo seguro (HTTPS) -->
+    <!-- <iframe src="https://seu-anuncio-https.com/ad" width="100%" height="60" style="border:0;" loading="lazy" referrerpolicy="no-referrer"></iframe> -->
+
+    <!-- Placeholder seguro caso o iframe real seja bloqueado (ou enquanto testa) -->
+    <div id="adArea" class="ad-placeholder">
+        <iframe src="https://zerads.com/ad/ad.php?width=300&ref=10129" marginwidth="0" marginheight="0" width="300" height="250" scrolling="no" border="0" frameborder="0"></iframe>
+    </div>
+  </div>
+
+  <div class="notice" id="notice" aria-live="polite"></div>
+</div>
+
+<script>
+/* ---------- Helpers para pegar URL (query ou hash) ---------- */
+function getDestFromQueryOrHash() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('url');
+    if (q && q.trim().length) return decodeURIComponent(q);
+
+    // try hash (support redirect.html#https://example.com)
+    if (window.location.hash && window.location.hash.length > 1) {
+      const h = window.location.hash.substring(1);
+      if (h.trim().length) return decodeURIComponent(h);
     }
+    return null;
+  } catch (err) {
+    console.error('Erro ao interpretar URL:', err);
+    return null;
+  }
+}
+
+/* ---------- Setup ---------- */
+const DEST = getDestFromQueryOrHash();
+console.log('debug: destino raw =', DEST);
+
+const timerEl = document.getElementById('timer');
+const btn = document.getElementById('btnIr');
+const notice = document.getElementById('notice');
+const adArea = document.getElementById('adArea');
+
+if (!DEST) {
+  timerEl.textContent = '';
+  notice.innerText = 'URL de destino não informada. Use ?url=https://exemplo.com ou #https://exemplo.com';
+  btn.disabled = true;
+  btn.style.display = 'none';
+  console.warn('Nenhum parâmetro url encontrado.');
+  throw new Error('Parâmetro url ausente');
+}
+
+/* Segurança mínima: tenta garantir que comece com http/https */
+let destino = DEST.trim();
+if (!/^https?:\/\//i.test(destino)) {
+  // tenta adicionar https por padrão
+  destino = 'https://' + destino;
+  console.warn('URL sem esquema detectada, adicionando https:// ->', destino);
+}
+
+/* Mostra destino no console para debug */
+console.log('destino final para redirecionar:', destino);
+
+/* ---------- Ad iframe - tentativa segura automática ---------- */
+/* Se você quiser forçar um iframe HTTPS, altere adIframeSrc para sua URL de anúncio HTTPS */
+const adIframeSrc = null; // Ex: 'https://seu-anuncio-https.com/ad'
+
+// Se tiver um source HTTPS definido, insere iframe; senão mantém placeholder
+if (adIframeSrc && /^https:\/\//i.test(adIframeSrc)) {
+  const iframe = document.createElement('iframe');
+  iframe.src = adIframeSrc;
+  iframe.width = '100%';
+  iframe.height = '60';
+  iframe.style.border = '0';
+  iframe.loading = 'lazy';
+  iframe.referrerPolicy = 'no-referrer';
+  adArea.replaceWith(iframe);
+  console.log('Anúncio iframe inserido:', adIframeSrc);
+} else {
+  // Mantém placeholder e mostra aviso se o anúncio estava tentando usar http
+  adArea.innerText = 'Banner / Iframe do anúncio (insira um src HTTPS no código)';
+  if (adIframeSrc && !/^https:\/\//i.test(adIframeSrc)) {
+    console.warn('O atributo adIframeSrc não está em HTTPS — iframe seria bloqueado em HTTPS.');
+  }
+}
+
+/* ---------- Contador e ativação do botão ---------- */
+let totalTime = 15;      // redireciona automaticamente em 15s
+let enableAfter = 10;    // habilita o botão após 10s
+
+let remaining = totalTime;
+timerEl.textContent = remaining;
+
+const tick = () => {
+  remaining--;
+  timerEl.textContent = remaining;
+  // ativa botão quando chegar em enableAfter (i.e., quando remaining <= totalTime-enableAfter)
+  if (remaining <= (totalTime - enableAfter)) {
+    // Na nossa lógica: totalTime=15, enableAfter=10 => quando remaining <=5 o botão ativa.
+    // Se preferir ativar após 10s, definimos condição baseada em elapsed:
+  }
+
+  // Melhor: ativa quando elapsed >= enableAfter
+  const elapsed = totalTime - remaining;
+  if (elapsed >= enableAfter && !btn.classList.contains('ativo')) {
+    btn.classList.add('ativo');
+    btn.disabled = false;
+    btn.setAttribute('aria-disabled', 'false');
+    btn.innerText = 'Ir agora';
+    console.log('Botão ativado após', elapsed, 'segundos');
+  }
+
+  if (remaining <= 0) {
+    clearInterval(intervalId);
+    console.log('Timer chegou a zero — redirecionando para', destino);
+    window.location.href = destino;
+  }
+};
+
+const intervalId = setInterval(tick, 1000);
+
+/* Coloca link no botão (abre na mesma aba) e protege contra clicks antes do permitido */
+btn.addEventListener('click', (ev) => {
+  if (!btn.classList.contains('ativo')) {
+    ev.preventDefault();
+    return;
+  }
+  // impede múltiplos cliques
+  btn.disabled = true;
+  btn.classList.remove('ativo');
+  btn.innerText = 'Redirecionando...';
+  clearInterval(intervalId);
+  // redireciona
+  window.location.href = destino;
+});
+
+/* Mostra aviso visível também */
+notice.innerText = `Destino: ${destino} — botão libera após ${enableAfter}s; redireciona automaticamente em ${totalTime}s.`;
+
+/* Adiciona logs extras para debug */
+console.log('Configuração: totalTime =', totalTime, ', enableAfter =', enableAfter);
+console.log('Se o anúncio não aparecer verifique se o iframe usa HTTPS (mixed-content).');
+</script>
+
+</body>
+</html>
 
     #btnIr.ativo {
         cursor: pointer;
