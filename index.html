@@ -10,17 +10,29 @@
         font-family: Arial, sans-serif;
         text-align: center;
         padding: 40px 10px;
+        background: #f5f5f5;
+    }
+
+    h2 {
+        color: #333;
+    }
+
+    #contador {
+        font-size: 22px;
+        margin: 15px 0;
+        color: #444;
     }
 
     #btnIr {
-        background: #4CAF50;
+        background: #008CFF;
         color: #fff;
-        padding: 12px 25px;
+        padding: 14px 30px;
+        font-size: 20px;
         border: none;
-        border-radius: 6px;
-        font-size: 18px;
+        border-radius: 8px;
         cursor: not-allowed;
-        opacity: 0.6;
+        opacity: 0.5;
+        transition: .3s;
     }
 
     #btnIr.ativo {
@@ -29,115 +41,53 @@
     }
 
     #pub {
-        margin-top: 40px;
-        display: block;
+        margin-top: 35px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 </style>
 </head>
+
 <body>
 
-<h2>Você será redirecionado em <span id="contador">10</span> segundos...</h2>
+<h2>Você será redirecionado em breve...</h2>
 
-<!-- BOTÃO -->
+<div id="contador">Aguarde <b>10</b> segundos</div>
+
 <button id="btnIr" disabled>Ir agora</button>
 
-<!-- PUBLICIDADE -->
 <div id="pub">
+    <h4>Publicidade</h4>
     <iframe src="https://zerads.com/ad/ad.php?width=300&ref=10129" marginwidth="0" marginheight="0" width="300" height="250" scrolling="no" border="0" frameborder="0"></iframe>
 </div>
 
 <script>
-// PEGAR LINK DO ?url=
-const params = new URLSearchParams(window.location.search);
-const destino = params.get("url") || "https://google.com"; // fallback
+    const urlParams = new URLSearchParams(window.location.search);
+    const destino = urlParams.get("url");
 
-// CONTADOR
-let tempo = 10;
-const contador = document.getElementById("contador");
-const btn = document.getElementById("btnIr");
+    let tempo = 10;
+    const contador = document.getElementById("contador");
+    const btn = document.getElementById("btnIr");
 
-const intervalo = setInterval(() => {
-    tempo--;
-    contador.textContent = tempo;
+    const interval = setInterval(() => {
+        tempo--;
+        contador.innerHTML = `Aguarde <b>${tempo}</b> segundos`;
 
-    if (tempo <= 0) {
-        clearInterval(intervalo);
-        btn.disabled = false;
-        btn.classList.add("ativo");
-        btn.textContent = "Ir agora";
-    }
-}, 1000);
+        if (tempo <= 0) {
+            clearInterval(interval);
+            btn.disabled = false;
+            btn.classList.add("ativo");
+            btn.innerText = "Ir para o site";
+            btn.onclick = () => window.location.href = destino;
+        }
+    }, 1000);
 
-// CLIQUE DO BOTÃO
-btn.addEventListener("click", () => {
-    window.location.href = destino;
-});
-</script>
-
-</body>
-</html>
-        padding: 12px 22px;
-        margin-top: 20px;
-        background: #007bff;
-        color: #fff;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 18px;
-        transition: 0.3s;
-    }
-    .btn:hover {
-        background: #0056b3;
-    }
-</style>
-
-</head>
-<body>
-
-<div class="box">
-    <h1>Redirecionando...</h1>
-    <p>Você será enviado para o link em:</p>
-    <div id="timer">15</div>
-    <a id="goNow" href="#" class="btn">Ir Agora</a>
-</div>
-
-<script>
-// --- PEGA LINK VIA GET OU HASH ---
-function getUrl() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("url")) return params.get("url");
-
-    if (window.location.hash.length > 1)
-        return decodeURIComponent(window.location.hash.substring(1));
-
-    return null;
-}
-
-const destino = getUrl();
-
-if (!destino) {
-    document.body.innerHTML = "<h2>URL inválida</h2>";
-    throw new Error("URL ausente");
-}
-
-// Define o botão
-document.getElementById("goNow").href = destino;
-
-// --- TIMER ---
-let counter = 15;
-const timerElement = document.getElementById("timer");
-
-const interval = setInterval(() => {
-    counter--;
-    timerElement.textContent = counter;
-
-    if (counter <= 0) {
-        clearInterval(interval);
-        window.location.href = destino;
-    }
-}, 1000);
-
-// Botão “Ir Agora” cancela o timer
-document.getElementById("goNow").onclick = () => clearInterval(interval);
+    // Redirecionamento automático após 15s
+    setTimeout(() => {
+        if (destino) window.location.href = destino;
+    }, 15000);
 </script>
 
 </body>
