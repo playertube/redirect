@@ -2,38 +2,149 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Redirecionando...</title>
+
 <style>
-  :root{
-    --bg:#ffffff;
-    --card:#fafafa;
-    --accent:#007bff;
-    --muted:#666;
-  }
   body{
     margin:0;
-    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    background:var(--bg);
-    color:#111;
+    font-family:Arial, sans-serif;
+    background:#ffffff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    padding:20px;
+    text-align:center;
+  }
+  .box{
+    background:#fafafa;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.1);
+    max-width:600px;
+    width:100%;
+  }
+  h1{ margin:0 0 10px; color:#007bff; }
+  #timer{ font-size:48px; font-weight:700; margin:10px 0; color:#007bff; }
+
+  #btnIr{
+    padding:12px 25px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    background:#ccc;
+    cursor:not-allowed;
+    opacity:0.6;
+    transition:.2s;
+  }
+  #btnIr.ativo{
+    background:#007bff;
+    color:#fff;
+    cursor:pointer;
+    opacity:1;
+  }
+
+  .adbox{
+    margin-top:30px;
+    background:#fff;
+    padding:15px;
+    border-radius:10px;
+    border:1px solid #eee;
+  }
+  .ad-title{ text-align:left; font-size:14px; color:#555; margin-bottom:8px; }
+  .placeholder{
+    height:60px;
+    background:#f0f0f0;
+    border-radius:6px;
     display:flex;
     align-items:center;
     justify-content:center;
-    min-height:100vh;
-    padding:20px;
+    color:#888;
   }
-  .wrap{
-    width:100%;
-    max-width:680px;
-    background:var(--card);
-    border-radius:12px;
-    box-shadow:0 8px 30px rgba(16,24,40,0.06);
-    padding:28px;
-    text-align:center;
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h1>Redirecionando...</h1>
+  <div id="timer">15</div>
+
+  <button id="btnIr" disabled>Ir agora</button>
+
+  <div class="adbox">
+    <div class="ad-title">Publicidade</div>
+    <div class="placeholder" id="pubPlaceholder">
+      <iframe src="https://zerads.com/ad/ad.php?width=300&ref=10129" marginwidth="0" marginheight="0" width="300" height="250" scrolling="no" border="0" frameborder="0"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Captura da URL ---------- */
+function getDestino(){
+  const p = new URLSearchParams(window.location.search);
+  let url = p.get("url");
+
+  if(!url){
+    if(window.location.hash.length > 1){
+      url = window.location.hash.substring(1);
+    }
   }
-  h1{ margin:0 0 6px; color:var(--accent); }
-  p.sub{ margin:0 0 18px; color:var(--muted); }
-  #timer{ font-size:48px; font-weight:700; color:var(--accent); margin-bottom:14px; }
+  if(!url) return null;
+
+  url = decodeURIComponent(url);
+
+  if(!/^https?:\/\//i.test(url)){
+    url = "https://" + url;
+  }
+  return url;
+}
+
+const destino = getDestino();
+if(!destino){
+  document.getElementById("timer").textContent = "";
+  document.getElementById("btnIr").remove();
+  alert("URL de destino não encontrada.\nUse ?url=https://site.com");
+  throw new Error("Destino ausente");
+}
+
+/* ---------- Contador / Botão / Redirecionamento ---------- */
+let total = 15;       // tempo total
+let liberar = 10;     // botão libera após 10s
+
+const timerEl = document.getElementById("timer");
+const btnIr = document.getElementById("btnIr");
+
+timerEl.textContent = total;
+
+const interval = setInterval(() => {
+  total--;
+  timerEl.textContent = total;
+
+  // Habilita botão após 10 segundos decorridos
+  if(total <= (15 - liberar) && !btnIr.classList.contains("ativo")){
+    btnIr.classList.add("ativo");
+    btnIr.disabled = false;
+  }
+
+  // Redireciona automaticamente quando chegar a 0
+  if(total <= 0){
+    clearInterval(interval);
+    window.location.href = destino;
+  }
+
+}, 1000);
+
+/* ---------- Clique no botão ---------- */
+btnIr.addEventListener("click", () => {
+  window.location.href = destino;
+});
+</script>
+
+</body>
+</html>
   #btnIr{
     display:inline-block;
     padding:12px 22px;
