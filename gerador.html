@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Link — Redirect</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f7f7;
+        padding: 20px;
+        text-align: center;
+    }
+    .box {
+        background: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 500px;
+        margin: auto;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    }
+    input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin-top: 10px;
+        font-size: 16px;
+    }
+    button {
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        margin-top: 15px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+    }
+    button:hover { background: #43a047; }
+
+    .result {
+        margin-top: 20px;
+        background: #eef;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        word-break: break-all;
+    }
+</style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Gerador de Link Redirect</h2>
+    <p>Digite a URL que você deseja redirecionar:</p>
+
+    <input id="origem" type="text" placeholder="https://exemplo.com/artigo123">
+
+    <button onclick="gerar()">Gerar Link</button>
+
+    <div id="r
