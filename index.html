@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redirecionando...</title>
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #ffffff;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        color: #333;
+    }
+    .box {
+        max-width: 500px;
+        margin: 60px auto;
+        padding: 25px;
+        border-radius: 16px;
+        background: #fafafa;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+    h1 {
+        font-size: 26px;
+        color: #007bff;
+    }
+    #timer {
+        font-size: 50px;
+        margin: 20px 0;
+        font-weight: bold;
+        color: #007bff;
+    }
+    .btn {
+        display: inline-block;
+        padding: 12px 22px;
+        margin-top: 20px;
+        background: #007bff;
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 18px;
+        transition: 0.3s;
+    }
+    .btn:hover {
+        background: #0056b3;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="box">
+    <h1>Redirecionando...</h1>
+    <p>Você será enviado para o link em:</p>
+    <div id="timer">15</div>
+    <a id="goNow" href="#" class="btn">Ir Agora</a>
+</div>
+
+<script>
+// --- PEGA LINK VIA GET OU HASH ---
+function getUrl() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("url")) return params.get("url");
+
+    if (window.location.hash.length > 1)
+        return decodeURIComponent(window.location.hash.substring(1));
+
+    return null;
+}
+
+const destino = getUrl();
+
+if (!destino) {
+    document.body.innerHTML = "<h2>URL inválida</h2>";
+    throw new Error("URL ausente");
+}
+
+// Define o botão
+document.getElementById("goNow").href = destino;
+
+// --- TIMER ---
+let counter = 15;
+const timerElement = document.getElementById("timer");
+
+const interval = setInterval(() => {
+    counter--;
+    timerElement.textContent = counter;
+
+    if (counter <= 0) {
+        clearInterval(interval);
+        window.location.href = destino;
+    }
+}, 1000);
+
+// Botão “Ir Agora” cancela o timer
+document.getElementById("goNow").onclick = () => clearInterval(interval);
+</script>
+
+</body>
+</html>
