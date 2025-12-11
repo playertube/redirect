@@ -1,154 +1,125 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Redirecionando...</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#ffffff;
-  text-align:center;
-  padding:40px 20px;
-}
+    body {
+        font-family: Arial, sans-serif;
+        background: #f3f3f3;
+        text-align: center;
+        padding: 20px;
+        margin-bottom: 120px; /* espaço para publicidade */
+    }
 
-.container{
-  max-width:600px;
-  margin:0 auto;
-  background:#f7f7f7;
-  padding:25px;
-  border-radius:10px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.08);
-}
+    .box {
+        max-width: 420px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 0 10px #0003;
+    }
 
-h1{
-  margin:0 0 10px;
-  color:#007bff;
-}
+    /* Barra de progresso */
+    #progressContainer {
+        width: 100%;
+        background: #ddd;
+        height: 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+        overflow: hidden;
+        display: none;
+    }
 
-#timer{
-  font-size:50px;
-  font-weight:bold;
-  color:#007bff;
-  margin:15px 0;
-}
+    #progressBar {
+        height: 100%;
+        width: 0%;
+        background: #4CAF50;
+        transition: width 0.1s linear;
+    }
 
-#btnIr{
-  padding:12px 25px;
-  font-size:18px;
-  border:none;
-  border-radius:8px;
-  background:#cccccc;
-  opacity:0.6;
-  cursor:not-allowed;
-  transition:0.2s;
-}
+    /* Área de publicidade */
+    #ads {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 8px 0;
+        text-align: center;
+        box-shadow: 0 -3px 8px #0004;
+        z-index: 99;
+    }
 
-#btnIr.ativo{
-  background:#007bff;
-  color:#ffffff;
-  opacity:1;
-  cursor:pointer;
-}
-
-.ad-box{
-  margin-top:25px;
-  background:white;
-  border:1px solid #e5e5e5;
-  padding:15px;
-  border-radius:8px;
-}
-
-.ad-title{
-  font-size:14px;
-  color:#555555;
-  text-align:left;
-  margin-bottom:8px;
-}
-
-.placeholder{
-  background:#eaeaea;
-  height:60px;
-  border-radius:6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#777777;
-  font-size:14px;
-}
+    #ads iframe {
+        width: 100%;
+        max-width: 468px;
+        height: 60px;
+        border: none;
+    }
 </style>
-
 </head>
 <body>
 
-<div class="container">
-  <h1>Redirecionando...</h1>
-  <div id="timer">15</div>
+<div class="box">
+    <h2>Aguarde...</h2>
+    <p id="timer">Preparando redirecionamento...</p>
 
-  <button id="btnIr" disabled>Ir agora</button>
-
-  <div class="ad-box">
-    <div class="ad-title">Publicidade</div>
-    <div class="placeholder">
-      <iframe src="https://zerads.com/ad/ad.php?width=300&ref=10129" marginwidth="0" marginheight="0" width="300" height="250" scrolling="no" border="0" frameborder="0"></iframe>
+    <div id="progressContainer">
+        <div id="progressBar"></div>
     </div>
-  </div>
+
+    <p style="margin-top:15px; color:#777; font-size:14px;">
+        Você será enviado automaticamente.
+    </p>
+</div>
+
+<!-- PUBLICIDADE -->
+<div id="ads">
+    <iframe src="https://zerads.com/ad/ad.php?width=468&ref=9545" scrolling="no"></iframe>
 </div>
 
 <script>
-function getDestino(){
-  const p = new URLSearchParams(window.location.search);
-  let url = p.get("url");
+    const destino = decodeURIComponent(location.hash.replace("#", ""));
 
-  if(!url && window.location.hash.length > 1){
-    url = window.location.hash.substring(1);
-  }
+    if (!destino || destino.length < 5) {
+        document.getElementById("timer").innerText = "Nenhuma URL válida encontrada.";
+        throw new Error("URL inválida");
+    }
 
-  if(!url){ return null; }
+    let segundos = 5;
+    const timer = document.getElementById("timer");
+    const progressContainer = document.getElementById("progressContainer");
+    const progressBar = document.getElementById("progressBar");
 
-  url = decodeURIComponent(url);
+    timer.innerText = "Redirecionando em " + segundos + " segundos...";
 
-  if(!/^https?:\/\//i.test(url)){
-    url = "https://" + url;
-  }
+    let countdown = setInterval(() => {
+        segundos--;
+        timer.innerText = "Redirecionando em " + segundos + " segundos...";
 
-  return url;
-}
+        if (segundos <= 0) {
+            clearInterval(countdown);
 
-const destino = getDestino();
+            // Mostrar barra
+            progressContainer.style.display = "block";
+            let porcento = 0;
 
-if(!destino){
-  alert("URL de destino não encontrada. Use ?url=https://site.com");
-  throw new Error("sem destino");
-}
+            let load = setInterval(() => {
+                porcento++;
+                progressBar.style.width = porcento + "%";
 
-let tempo = 15;
-const timer = document.getElementById("timer");
-const btnIr = document.getElementById("btnIr");
-
-const interval = setInterval(()=>{
-  tempo--;
-  timer.textContent = tempo;
-
-  if(tempo === 5){
-    btnIr.disabled = false;
-    btnIr.classList.add("ativo");
-  }
-
-  if(tempo <= 0){
-    clearInterval(interval);
-    window.location.href = destino;
-  }
-
-},1000);
-
-btnIr.addEventListener("click", ()=>{
-  window.location.href = destino;
-});
+                if (porcento >= 100) {
+                    clearInterval(load);
+                    window.location.href = destino;
+                }
+            }, 20);
+        }
+    }, 1000);
 </script>
 
 </body>
 </html>
-
