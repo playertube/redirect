@@ -18,7 +18,7 @@ FingerprintJS.load().then(fp => {
         </div>
       `
     } else {
-      sessionStorage.setItem("visitou_" + id, "1")
+      localStorage.setItem("visitou_" + id, "1")
     }
   })
 })
