@@ -11,7 +11,7 @@ FingerprintJS.load().then(fp => {
   fp.get().then(result => {
     const id = result.visitorId
 
-    if (sessionStorage.getItem("visitou_" + id)) {
+    if (localStorage.getItem("visitou_" + id)) {
       document.body.innerHTML = `
         <div style="text-align:center;padding:40px">
           <h2>Acesso já contabilizado</h2>
